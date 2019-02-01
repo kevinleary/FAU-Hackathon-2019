@@ -6,6 +6,6 @@ This is a repo for all FAU Hackathon 2019 related materials using the ESP32
 
 [2 - Getting Started](https://randomnerdtutorials.com/getting-started-with-esp32/)
 
-[3- IoT Watson Api for ESP32](https://developer.ibm.com/recipes/tutorials/connect-an-esp32-to-the-watson-iot-platform/)
+[3 - IoT Watson Api for ESP32](https://developer.ibm.com/recipes/tutorials/connect-an-esp32-to-the-watson-iot-platform/)
 
 [4 - Github Repo for ESP32](https://github.com/espressif/arduino-esp32)
