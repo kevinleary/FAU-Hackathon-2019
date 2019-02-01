@@ -10,6 +10,8 @@ This is a repo for all FAU Hackathon 2019 related materials using the ESP32
 
 [4 - Github Repo for ESP32](https://github.com/espressif/arduino-esp32)
 
+[5 - Github Repo with BLE examples and others](https://github.com/ibm-watson-iot/device-arduino/tree/master/samples)
+
 ## Code to get MAC address of ESP32 
 
 ```#include "esp_system.h"
