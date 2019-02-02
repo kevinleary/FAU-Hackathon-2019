@@ -12,6 +12,9 @@ This is a repo for all FAU Hackathon 2019 related materials using the ESP32
 
 [5 - Github Repo with BLE examples and others](https://github.com/ibm-watson-iot/device-arduino/tree/master/samples)
 
+## Setup of ESP32
+[Useful info](https://github.com/djaramil/esp32Workshop/blob/master/README.md)
+
 ## Code to get MAC address of ESP32 
 
 ```#include "esp_system.h"
