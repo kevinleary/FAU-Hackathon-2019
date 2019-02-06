@@ -1,6 +1,8 @@
 #include <DHT.h>
 #include <DHT_U.h>
 #include <Adafruit_Sensor.h>
+//NEED TO INSTALL `ADAFRUIT UNIFIED SENSOR` LIBRARY
+
 // Example testing sketch for various DHT humidity/temperature sensors
 // Written by ladyada, public domain
 
