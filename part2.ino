@@ -1,11 +1,10 @@
-setup(){
-
 #include <WiFi.h>
 #include <Adafruit_NeoPixel.h>
 #include <DHT.h>
 #include <ArduinoJson.h>
 
-// --------------------------------------------------------------------------------------------
+  // put your setup code here, to run once:
+  // --------------------------------------------------------------------------------------------
 //        UPDATE CONFIGURATION TO MATCH YOUR ENVIRONMENT
 // --------------------------------------------------------------------------------------------
 
@@ -18,10 +17,10 @@ setup(){
 #define NEOPIXEL_TYPE NEO_RGB + NEO_KHZ800
 
 // Temperatures to set LED by (assume temp in C)
-#define ALARM_COLD 0.0
-#define ALARM_HOT 30.0
-#define WARN_COLD 10.0
-#define WARN_HOT 25.0
+#define ALARM_COLD 50.0
+#define ALARM_HOT 90.0
+#define WARN_COLD 60.0
+#define WARN_HOT 75.0
 
 
 // Add WiFi connection information
@@ -46,6 +45,9 @@ unsigned char r = 0; // LED RED value
 unsigned char g = 0; // LED Green value
 unsigned char b = 0; // LED Blue value
 
+
+void setup() {
+
 // Start serial console
   Serial.begin(115200);
   Serial.setTimeout(2000);
@@ -69,11 +71,11 @@ unsigned char b = 0; // LED Blue value
 
 }
 
-void loop()
-{
+void loop() {
+  // put your main code here, to run repeatedly:
   h = dht.readHumidity();
-  t = dht.readTemperature(); // uncomment this line for Celsius
-  // t = dht.readTemperature(true); // uncomment this line for Fahrenheit
+  //t = dht.readTemperature(); // uncomment this line for Celsius
+  t = dht.readTemperature(true); // uncomment this line for Fahrenheit
 
   // Check if any reads failed and exit early (to try again).
   if (isnan(h) || isnan(t)) {
