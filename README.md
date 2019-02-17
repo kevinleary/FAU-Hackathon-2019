@@ -14,6 +14,8 @@ Extract and run the zip x64 exe for the correct driver
 
 [5 - Github Repo with BLE examples and others](https://github.com/ibm-watson-iot/device-arduino/tree/master/samples)
 
+[6 - MAIN GITHUB REPO FOR HACKATHON](https://github.com/djaramil/esp32S-Workshop)
+
 ## Setup of ESP32
 [Useful info](https://github.com/djaramil/esp32Workshop/blob/master/README.md)
 
