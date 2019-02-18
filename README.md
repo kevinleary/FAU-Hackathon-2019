@@ -1,6 +1,8 @@
 # FAU-Hackathon-2019
 This is a repo for all FAU Hackathon 2019 related materials using the ESP32
 
+Extract and run the zip x64 exe for the correct driver
+
 ## Links and other info
 [1 - ESP32 Pin layout](http://forum.fritzing.org/t/esp32s-hiletgo-dev-boad-with-pinout-template/5357)
 
@@ -11,6 +13,8 @@ This is a repo for all FAU Hackathon 2019 related materials using the ESP32
 [4 - Github Repo for ESP32](https://github.com/espressif/arduino-esp32)
 
 [5 - Github Repo with BLE examples and others](https://github.com/ibm-watson-iot/device-arduino/tree/master/samples)
+
+[6 - MAIN GITHUB REPO FOR HACKATHON](https://github.com/djaramil/esp32S-Workshop)
 
 ## Setup of ESP32
 [Useful info](https://github.com/djaramil/esp32Workshop/blob/master/README.md)
