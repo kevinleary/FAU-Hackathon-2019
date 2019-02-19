@@ -80,9 +80,15 @@ CameraInitiate();
 
 
 // START RECORDING
-StartRecording();
+//StartRecording();
+BootPhotoMode();
+delay(5000);
+
+TakeAPic();
 
 delay(5000);
+
+
 
 // STOP RECORDING
 StopRecording();
@@ -132,6 +138,45 @@ void StopRecording(){
   Serial.println("Stopped");
 }
 
+void BootPhotoMode(){
+  //Starts up photo mode
+  Serial.print("connecting to ");
+  Serial.println(host);
+  
+  if (!client.connect("10.5.5.9", httpPort)) {
+    Serial.println("connection failed");
+    return;
+  }
+
+  String BootUrl = "/gp/gpControl/command/sub_mode?mode=1&sub_mode=0";
+  Serial.print("Requesting URL: ");
+  Serial.println(BootUrl);
+  client.print(String("GET ") + BootUrl + " HTTP/1.1\r\n" +
+  "Host: " + host + "\r\n" +
+  "Connection: close\r\n\r\n");
+  Serial.println("Photo Mode!");
+}
+
+void TakeAPic() {
+
+  Serial.print("connecting to ");
+  Serial.println(host);
+
+  if (!client.connect("10.5.5.9", httpPort)) {
+    Serial.println("connection failed");
+    return;
+  }
+  
+  //Command to take a pic
+  String StopUrl = "/gp/gpControl/command/shutter?p=1";
+  Serial.print("Requesting URL: ");
+  Serial.println(StopUrl);
+  client.print(String("GET ") + StopUrl + " HTTP/1.1\r\n" +
+  "Host: " + host + "\r\n" +
+  "Connection: close\r\n\r\n");
+  Serial.println("Pic Taken!");
+
+}
 
 
 // FUNCTION TO WAKE UP THE CAMERA
