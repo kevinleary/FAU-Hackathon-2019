@@ -20,7 +20,7 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 #define LOGO_HEIGHT   16
 #define LOGO_WIDTH    16
 
-int inputPin = 18;               // choose the input pin (for PIR sensor)
+int inputPin = 5;               // choose the input pin (for PIR sensor)
 int pirState = LOW;             // we start, assuming no motion detected
 int val = 0;                    // variable for reading the pin status
 
@@ -46,18 +46,21 @@ static const unsigned char PROGMEM logo_bmp[] =
   
 void setup() {
   pinMode(inputPin, INPUT);     // declare sensor as input
+  
   Serial.begin(115200);
   // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
-  if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { // Address 0x3D for 128x64
+  /*if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { // Address 0x3D for 128x64
     Serial.println(F("SSD1306 allocation failed"));
     for(;;); // Don't proceed, loop forever
-  }
+  }*/
+  Wire.begin();
+  display.begin(SSD1306_SWITCHCAPVCC, 0x3c);
   // Show initial display buffer contents on the screen --
   // the library initializes this with an Adafruit splash screen.
   //display.display();
   //delay(2000); // Pause for 2 seconds
   // Clear the buffer
-  display.clearDisplay();
+  //display.clearDisplay();
   // Draw a single pixel in white
   //display.drawPixel(10, 10, WHITE);
   // Show the display buffer on the screen. You MUST call display() after
@@ -99,19 +102,28 @@ void loop() {
       Serial.println("Motion detected!");
       // We only want to print on the output change, not state
       pirState = HIGH;
-      testregulartext_motion();
-      delay(1000);
+      display.clearDisplay();
+      display.setTextColor(WHITE);
+      display.setTextSize(1);
+      display.setCursor(0,0);
+      display.print("Motion detected!");
+      //delay(1000);
     }
   } else {
     if (pirState == HIGH){
       // we have just turned of
       Serial.println("Motion ended!");
-      testregulartext();
+      display.clearDisplay();
+      display.setTextColor(WHITE);
+      display.setTextSize(1);
+      display.setCursor(0,0);
+      display.print("Motion ended");
       // We only want to print on the output change, not state
       pirState = LOW;
     }
   }
-  display.clearDisplay();
+  display.display();
+  delay(2000);
 }
 void testdrawline() {
   int16_t i;
@@ -306,9 +318,9 @@ void testregulartext(void) {
   display.setTextSize(2); // Draw 2X-scale text
   display.setTextColor(WHITE);
   display.setCursor(10, 0);
-  display.println(F("No Motion"));
+  display.print("Motion Ended");
   display.display();      // Show initial text
-  delay(1000);
+  //delay(1000);
 }
 
 //for regular text to be displayed
@@ -317,9 +329,9 @@ void testregulartext_motion(void) {
   display.setTextSize(2); // Draw 2X-scale text
   display.setTextColor(WHITE);
   display.setCursor(10, 0);
-  display.println(F("Motion Detected!"));
+  display.print("Motion Detected!");
   display.display();      // Show initial text
-  delay(1000);
+  //delay(1000);
   /*// Scroll in various directions, pausing in-between:
   display.startscrollright(0x00, 0x0F);
   delay(2000);
