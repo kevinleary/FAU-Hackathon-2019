@@ -142,15 +142,17 @@ void setup() {
   ConnectToWifi(ssid_GP, pass_GP);
   CameraInitiate();
   StartRecording();
-  delay(10000);
-  StopRecording();
+  //delay(10000);
+  //StopRecording();
   delay(1000);
 
   WiFi.disconnect(true);      //hopefully?
-  WiFi.begin(ssid_FAU, pass_FAU);
+  delay(5000);
+  //WiFi.begin(ssid_FAU, pass_FAU);
   
-  //ConnectToWifi(ssid_FAU, pass_FAU);
-  StartMQTT();
+  ConnectToWifi(ssid_FAU, pass_FAU);
+  //delay(10000);
+  //StartMQTT();
   
 }
 
@@ -202,6 +204,16 @@ void loop() {
   StartMQTTLoop();
   
   delay(100);
+
+  if (h > 80) {
+    WiFi.disconnect(true);
+    delay(5000);
+    ConnectToWifi(ssid_GP, pass_GP);
+    delay(1000);
+    StopRecording();
+    delay(1000);
+    ConnectToWifi(ssid_FAU, pass_FAU);
+  }
 }
 
 void StartMQTT() {
