@@ -4,6 +4,7 @@
 //libraries 
 #include <SPI.h>
 #include <Wire.h>
+#include <Adafruit_NeoPixel.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 #include <DHT.h>
@@ -11,6 +12,11 @@
 #include <PubSubClient.h>     //for MQTT connection
 #include "WiFi.h"
 #include <WiFiUdp.h>
+
+//set up neopixel
+#define RGB_PIN 12
+#define NEOPIXEL_TYPE NEO_RGB + NEO_KHZ800
+Adafruit_NeoPixel pixel = Adafruit_NeoPixel(1, RGB_PIN, NEOPIXEL_TYPE);
 
 //Watson IoT connection details 
 #define MQTT_HOST "x5ri6x.messaging.internetofthings.ibmcloud.com"    //First 6 characters found at (IBM Watson IoT Platform->Settings->Identity
@@ -108,25 +114,7 @@ int b = 0;
 int m = 0;
 unsigned long startTime; //timer to determine when to send data
 
-/*
-static const unsigned char PROGMEM logo_bmp[] =
-{ B00000000, B11000000,
-  B00000001, B11000000,
-  B00000001, B11000000,
-  B00000011, B11100000,
-  B11110011, B11100000,
-  B11111110, B11111000,
-  B01111110, B11111111,
-  B00110011, B10011111,
-  B00011111, B11111100,
-  B00001101, B01110000,
-  B00011011, B10100000,
-  B00111111, B11100000,
-  B00111111, B11110000,
-  B01111100, B11110000,
-  B01110000, B01110000,
-  B00000000, B00110000 };
- */
+
 // defines pins numbers for HC SR04 Sensor
 const int trigPin = 23; // TRIGGER PIN
 const int echoPin = 19; // ECHO PIN
@@ -175,6 +163,8 @@ void callback(char* topic, byte* payload, unsigned int length) {
 //SETUP
 //**********************************************************************************
 void setup() {
+
+  pixel.begin();
   
   //Timer code to post data to Watson
   startTime = millis();
@@ -207,22 +197,7 @@ void setup() {
   //delay(10000);
   //StartMQTT();
 
-    /*mqtt.loop();
-if(WiFi.SSID() != ssid_GP){
-  while (!mqtt.connected()) {
-    Serial.print("Attempting MQTT connection...");
-    // Attempt to connect
-    if (mqtt.connect(MQTT_DEVICEID, MQTT_USER, MQTT_TOKEN)) {
-      Serial.println("MQTT Connected");
-      mqtt.subscribe(MQTT_TOPIC_DISPLAY);
-      mqtt.loop();
-    } else {
-      Serial.println("MQTT Failed to connect!");
-      delay(5000);
-    }
-  }
-}
-*/
+
   
 }
 
@@ -232,6 +207,15 @@ if(WiFi.SSID() != ssid_GP){
 //*********************************************************************************
 void loop() {
 
+if (recButtonPushCounter == 0){
+    
+    pixel.setPixelColor(0, 255, 0, 0);
+    pixel.show();
+}
+if (recButtonPushCounter > 0){
+    pixel.setPixelColor(0, 0, 255, 0);
+    pixel.show();
+}
 sonarValue = digitalRead(sonarInputPin);  // read input value - Sonar
 
 //-----------------------------------------------------------------------
@@ -286,7 +270,7 @@ sonarValue = digitalRead(sonarInputPin);  // read input value - Sonar
   lastRecButtonState = recButtonState;
 //-----------------------------------------------------------------------
 if(recButtonPushCounter > 0){
-  recButtonPushCounter = 0;
+  //recButtonPushCounter = 0;
   WiFi.disconnect(true);
   delay(1000);
   ConnectToWifi(ssid_GP, pass_GP);
@@ -477,13 +461,7 @@ void StartMQTTLoop() {
    }
   
   // Pause - but keep polling MQTT for incoming messages
-  /*
-  for(int i = 0; i < 1; i++) {
-    //mqtt.loop();
-    delay(250);
-  }
-  //mqtt.loop();
-  */
+
 
 }
 
