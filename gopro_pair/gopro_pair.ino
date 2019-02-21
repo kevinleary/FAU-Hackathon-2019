@@ -80,7 +80,7 @@ void StartPin(){
   //ENTER YOUR PIN HERE WHERE IT SAYS XXXX
   //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!  
   
-  String StartUrl = "/gpPair?c=start&pin=XXXX&mode=0";
+  String StartUrl = "/gpPair?c=start&pin=1924&mode=0";
   Serial.print("Requesting URL: ");
   Serial.println(StartUrl);
   client.print(String("GET ") + StartUrl + " HTTP/1.1\r\n" +
@@ -104,7 +104,7 @@ void FinishPin(){
   //ENTER YOUR PIN HERE WHERE IT SAYS XXXX
   //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   
-  String StopUrl = "10.5.5.9/gpPair?c=finish&pin=XXXX&mode=0";
+  String StopUrl = "10.5.5.9/gpPair?c=finish&pin=1924&mode=0";
   Serial.print("Requesting URL: ");
   Serial.println(StopUrl);
   client.print(String("GET ") + StopUrl + " HTTP/1.1\r\n" +
