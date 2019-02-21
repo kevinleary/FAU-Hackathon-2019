@@ -93,6 +93,14 @@ d = distance;
 h = dht.readHumidity();
 t = dht.readTemperature(true);
 
+display.clearDisplay();
+display.setTextColor(WHITE);
+display.setTextSize(1.8);
+display.setCursor(0,0);
+PrintDistance(d);
+PrintTemp();
+PrintMotion();
+/*
 if (d > CLOSE && d < CENTER) {
 
       display.clearDisplay();
@@ -128,7 +136,7 @@ else if (d > FAR) {
       PrintTemp();
       PrintMotion();
 }
-
+*/
 display.display();
 // Prints the distance on the Serial Monitor
 Serial.print("Distance: ");
@@ -138,7 +146,7 @@ delay(100);
 
 void PrintTemp() {
 
-  display.print((String)"\nTemp: " + t + "  Hum: " + h);
+  display.print((String)"\nTemp: " + t + "\nHum: " + h);
 }
 
 void PrintMotion() {
@@ -155,4 +163,36 @@ void PrintMotion() {
       pirState = LOW;
     }
   }
+}
+
+void PrintDistance(int d) {
+
+  display.print("Target Distance: ");
+  display.print(d);
+  /*if (d > CLOSE && d < CENTER) {
+
+
+      display.print("Target Distance: ");
+      display.print(d);
+      delay(100);
+
+  }
+
+  else if (d > CENTER && d < FAR) {
+      
+
+      display.print("Target Distance: ");
+      display.print(d);
+ 
+
+  }
+
+  else if (d > FAR) {
+      
+      display.print("Target Distance:");
+      display.print(d);
+      delay(100);
+  }*/
+
+  
 }
