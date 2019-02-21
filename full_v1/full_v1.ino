@@ -162,7 +162,9 @@ void callback(char* topic, byte* payload, unsigned int length) {
   Serial.println((char *)payload);
 }
 
-
+//**********************************************************************************
+//SETUP
+//**********************************************************************************
 void setup() {
   pinMode(trigPin, OUTPUT); // Sets the trigPin as an Output
   pinMode(echoPin, INPUT); // Sets the echoPin as an Input
@@ -216,7 +218,7 @@ sonarValue = digitalRead(sonarInputPin);  // read input value - Sonar
       Serial.println("off");
     }
     // Delay a little bit to avoid bouncing
-    delay(50);
+    //delay(50); Comment out to speed up
   }
   // save the current state as the last state, for next time through the loop
   lastButtonState = buttonState;
@@ -322,7 +324,7 @@ if(buttonPushCounter%2 == 0 && buttonPushCounter > 1){
     display.print(BPM);
     display.print(" BPM");
     PrintMotion();
-    delay(20);
+    //delay(20); Comment out to speed up
   }
 
 display.display();
@@ -335,15 +337,21 @@ Serial.println(distance);
   //SEND JSON
   StartMQTTLoop();
   
-  delay(100);
+  //delay(100); Comment out to speed up
 
   if (h > 80) {
     WiFi.disconnect(true);
-    delay(5000);
+    //delay(5000);
+    delay(1000);
     ConnectToWifi(ssid_GP, pass_GP);
-    delay(1000);
+    //delay(1000);Comment out to speed up. Halved on next line
+    delay(500);
     StopRecording();
-    delay(1000);
+    //delay(1000);Comment out to speed up. Halved on next line
+    delay(500);
+    WiFi.disconnect(true);
+    //delay(1000); Comment out to speed up. Halved on next line
+    delay(500);
     ConnectToWifi(ssid_FAU, pass_FAU);
   }
 
@@ -355,6 +363,44 @@ Serial.println(distance);
 
 
 //Function Definitions
+
+void StartMQTTLoop() {
+
+  mqtt.loop();
+  while (!mqtt.connected()) {
+    Serial.print("Attempting MQTT connection...");
+    // Attempt to connect
+    if (mqtt.connect(MQTT_DEVICEID, MQTT_USER, MQTT_TOKEN)) {
+      Serial.println("MQTT Connected");
+      mqtt.subscribe(MQTT_TOPIC_DISPLAY);
+      mqtt.loop();
+    } else {
+      Serial.println("MQTT Failed to connect!");
+      delay(5000);
+    }
+  }
+
+     // Print Message to console in JSON format
+   status["temp"] = t;
+   status["humidity"] = h;
+   status["distance"] = d;
+   status["pulse"] = b;
+   status["motion"] = m;
+   //status["test"] = "test";
+   payload.printTo(msg, 200);
+   Serial.println(msg);
+   if (!mqtt.publish(MQTT_TOPIC, msg)) {
+      Serial.println("MQTT Publish failed");
+   }
+  
+  // Pause - but keep polling MQTT for incoming messages
+  for(int i = 0; i < 10; i++) {
+    mqtt.loop();
+    delay(250);
+  }
+  //mqtt.loop();
+
+}
 
 void PrintTemp() {
 
@@ -371,6 +417,8 @@ void PrintMotion() {
         display.setTextSize(2);
         display.setCursor(0,0);
         display.print("\nMotion \ndetected!");
+        m = 1;
+        delay(1000);
     }
   }
   else {
@@ -378,6 +426,7 @@ void PrintMotion() {
       display.print("\nMotion ended!");
       pirState = LOW;
     }
+    m = 0;
   }
 }
 
@@ -391,6 +440,184 @@ void PrintBPM(int BPM){
 
   display.print("\n\nBPM: ");
   display.print(BPM); 
+}
+
+void ConnectToWifi(char ssid[], char pass[]) {
+
+  // attempt to connect to Wifi network:
+  while ( WiFi.status() != WL_CONNECTED) {
+    WIFI = false;
+    Serial.print("Attempting to connect to SSID: ");
+    Serial.println(ssid);
+    // Connect to WPA/WPA2 network. Change this line if using open or WEP network:
+    WiFi.begin(ssid, pass);
+
+    // wait 8 seconds for connection:
+    delay(8000);
+  }
+
+  Serial.println("Connected to wifi");
+  WIFI = true;
+  printWifiStatus();
+
+}
+
+void printWifiStatus() {
+  // print the SSID of the network you're attached to:
+  Serial.print("SSID: ");
+  Serial.println(WiFi.SSID());
+
+  // print your WiFi shield's IP address:
+  IPAddress ip = WiFi.localIP();
+  Serial.print("IP Address: ");
+  Serial.println(ip);
+
+  // print the received signal strength:
+  long rssi = WiFi.RSSI();
+  Serial.print("signal strength (RSSI):");
+  Serial.print(rssi);
+  Serial.println(" dBm");
+}
+
+void SendMagicPacket(){
+
+  //Create a 102 byte array
+  byte magicPacket[102];
+
+  // Variables for cycling through the array
+  int Cycle = 0, CycleMacAdd = 0, IndexArray = 0;
+
+  // This for loop cycles through the array
+  for( Cycle = 0; Cycle < 6; Cycle++){
+
+    // The first 6 bytes of the array are set to the value 0xFF
+    magicPacket[IndexArray] = 0xFF;
+
+    // Increment the array index
+    IndexArray++;
+  }
+
+  // Now we cycle through the array to add the GoPro address
+  for( Cycle = 0; Cycle < 16; Cycle++ ){
+    //eseguo un Cycle per memorizzare i 6 byte del
+    //mac address
+    for( CycleMacAdd = 0; CycleMacAdd < 6; CycleMacAdd++){
+      
+      magicPacket[IndexArray] = remote_MAC_ADD[CycleMacAdd];
+      
+      // Increment the array index
+      IndexArray++;
+    }
+  }
+
+  //The magic packet is now broadcast to the GoPro IP address and port
+  Udp.beginPacket(broadCastIp, wolPort);
+  Udp.write(magicPacket, sizeof magicPacket);
+  Udp.endPacket();
+
+}
+
+void StartRecording(){
+  Serial.print("connecting to ");
+  Serial.println(host);
+
+  if (!client.connect("10.5.5.9", httpPort)) {
+    Serial.println("connection failed");
+    return;
+  }
+
+  //Command for starting recording
+  String StartUrl = "/gp/gpControl/command/shutter?p=1";
+  Serial.print("Requesting URL: ");
+  Serial.println(StartUrl);
+  client.print(String("GET ") + StartUrl + " HTTP/1.1\r\n" +
+  "Host: " + host + "\r\n" +
+  "Connection: close\r\n\r\n");
+  Serial.println("Recording");
+}
+
+
+
+void StopRecording(){
+  Serial.print("connecting to ");
+  Serial.println(host);
+  
+  if (!client.connect("10.5.5.9", httpPort)) {
+    Serial.println("connection failed");
+    return;
+  }
+
+  //Command for stopping recording
+  String StopUrl = "/gp/gpControl/command/shutter?p=0";
+  Serial.print("Requesting URL: ");
+  Serial.println(StopUrl);
+  client.print(String("GET ") + StopUrl + " HTTP/1.1\r\n" +
+  "Host: " + host + "\r\n" +
+  "Connection: close\r\n\r\n");
+  Serial.println("Stopped");
+}
+
+void BootPhotoMode(){
+  //Starts up photo mode
+  Serial.print("connecting to ");
+  Serial.println(host);
+  
+  if (!client.connect("10.5.5.9", httpPort)) {
+    Serial.println("connection failed");
+    return;
+  }
+
+  String BootUrl = "/gp/gpControl/command/sub_mode?mode=1&sub_mode=0";
+  Serial.print("Requesting URL: ");
+  Serial.println(BootUrl);
+  client.print(String("GET ") + BootUrl + " HTTP/1.1\r\n" +
+  "Host: " + host + "\r\n" +
+  "Connection: close\r\n\r\n");
+  Serial.println("Photo Mode!");
+}
+
+void TakeAPic() {
+
+  Serial.print("connecting to ");
+  Serial.println(host);
+
+  if (!client.connect("10.5.5.9", httpPort)) {
+    Serial.println("connection failed");
+    return;
+  }
+  
+  //Command to take a pic
+  String StopUrl = "/gp/gpControl/command/shutter?p=1";
+  Serial.print("Requesting URL: ");
+  Serial.println(StopUrl);
+  client.print(String("GET ") + StopUrl + " HTTP/1.1\r\n" +
+  "Host: " + host + "\r\n" +
+  "Connection: close\r\n\r\n");
+  Serial.println("Pic Taken!");
+
+}
+
+
+// FUNCTION TO WAKE UP THE CAMERA
+
+void CameraInitiate(){
+
+  //Begin UDP communication
+  Udp.begin(localPort);
+
+  //Send the magic packet to wake up the GoPro out of sleep
+  delay(2000);
+  SendMagicPacket();
+  delay(5000);  
+
+  // Absolutely necessary to flush port of UDP junk for Wifi client communication
+  Udp.flush();
+  delay(1000);
+
+  //Stop UDP communication
+  Udp.stop();
+  delay(1000);
+
 }
 
 void ShowWifiStatus(bool WIFI){
